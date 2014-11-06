@@ -10,9 +10,6 @@ try:
 except ImportError:
     raise Exception('Please make boto available first.')
 
-AWS_ACCESS_KEY_ID = 'AKIAIIUEUG23IMVFIBPA'
-AWS_SECRET_ACCESS_KEY = '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'
-
 all_prices = []
 
 
@@ -22,7 +19,8 @@ def downloadData(regionsNames, args):
     pool = Pool(cpu_count())
     print 'Total number of regions: ' + str(len(regionsNames))
     for num, name in enumerate(regionsNames):
-        f = pool.apply_async(getSpotPricesFromRegion, [name, num], callback=cbLogPrices)
+        f = pool.apply_async(getSpotPricesFromRegion, [args.awsKeyId, args.awsSecret, name, num],
+                             callback=cbLogPrices)
         # This ensures that the error is propagated to stdout should the function throw.
         # Note that this fails if the failure happens if num == 0, 1, 2, 3, ... (except the last)
         # For our purposes here, using multiple threads works though.
@@ -37,7 +35,7 @@ def cbLogPrices(pr):
     all_prices.append(pr)
 
 
-def getSpotPricesFromRegion(regionName, regionNum):
+def getSpotPricesFromRegion(awsKeyId, awsSecret, regionName, regionNum):
     '''Gets spot prices of the specified region.'''
     from datetime import datetime, timedelta
     now = datetime.now()
@@ -45,8 +43,8 @@ def getSpotPricesFromRegion(regionName, regionNum):
 
     print 'Processing region number ' + str(regionNum) + ': ',
     pr = boto.ec2.connect_to_region(regionName,
-                                    aws_access_key_id=AWS_ACCESS_KEY_ID,
-                                    aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+                                    aws_access_key_id=awsKeyId,
+                                    aws_secret_access_key=awsSecret
                                     ).get_spot_price_history(start_time=start.isoformat(),
                                                              end_time=now.isoformat())
     print 'Finished getting the prices from: ' + regionName
@@ -70,13 +68,21 @@ def parseArgs():
     '''Parse arguments as specified.'''
     desc = 'Retrieves the latest EC2 prices and displays the lowest 3 and highest priced zones.'
     parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument('-a', '--awsKeyId', dest='awsKeyId',
+                        help='Sets the AWS key ID.')
+    parser.add_argument('-b', '--awsSecret', dest='awsSecret',
+                        help='Sets the AWS secret access key.')
     parser.add_argument('-t', '--instanceType', dest='instanceType', default='r3.large',
                         help='Sets the EC2 instance type. Defaults to %(default)s.')
     parser.add_argument('-o', '--opSystem', dest='os', default='linux',
                         help='Sets the operating system. Choose from [linux|windows|all]. ' +
                              'Defaults to %(default)s.')
-
     args = parser.parse_args()
+
+    if not args.awsKeyId:
+        raise Exception('You must specify an AWS key ID.')
+    if not args.awsSecret:
+        raise Exception('You must specify an AWS secret access key.')
 
     args.instanceType = tuple(args.instanceType.split(','))  # Casted to a tuple for valid queries
 
