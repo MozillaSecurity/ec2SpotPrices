@@ -1,9 +1,7 @@
 #! /usr/bin/env python
 
 import argparse
-import os  # FIXLASTME
 import sqlite3
-import sys
 import urllib2
 
 try:
@@ -77,8 +75,6 @@ def parseArgs():
     parser.add_argument('-o', '--opSystem', dest='os', default='linux',
                         help='Sets the operating system. Choose from [linux|windows|all]. ' +
                              'Defaults to %(default)s.')
-    parser.add_argument('-s', '--saveFile', dest='saveFile',
-                        help='Use local saved file instead of downloading data.')  #FIXLASTME
 
     args = parser.parse_args()
 
@@ -92,9 +88,6 @@ def parseArgs():
         args.os = ('Linux/UNIX', 'Windows')
     else:
         raise Exception('Invalid OS, choose from [linux|windows|all]: ' + args.os)
-
-    if args.saveFile:
-        args.saveFile = os.path.abspath(os.path.expanduser(args.saveFile))  # FIXLASTME
 
     return args
 
@@ -141,35 +134,13 @@ def printResults(cur, args):
 def main(all_prices):
     args = parseArgs()
 
-    if not (args.saveFile or isInternetOn()):
-        raise Exception('Either go online to download data, or specify a local data file.')
-
     allRegionNames = [str(x).split(':')[1] for x in boto.ec2.regions()]
     # See https://github.com/boto/boto/issues/1951 as to why we reject the following regions.
     regionNames = [x for x in allRegionNames if x not in ['cn-north-1', 'us-gov-west-1']]
 
-    ### FIXLASTME ##################################################################################
-    if not args.saveFile or (args.saveFile and not os.path.isfile(args.saveFile)):
-        downloadData(regionNames, args)
-        if args.saveFile and not os.path.isfile(args.saveFile):
-            from pickle import dump as pkdump
-            with open(args.saveFile, 'wb') as f:
-                pkdump(all_prices, f)
-    else:
-        from pickle import load as pkload
-        with open(args.saveFile, 'rb') as f:
-            all_prices = pkload(f)
-
+    downloadData(regionNames, args)
     analysePrices(args, all_prices)
-    ################################################################################################
-
-    #downloadData(regionNames, args)
-    #analysePrices(args)  # FIXLASTME: Remove second argument to analysePrices
 
 
 if __name__ == '__main__':
-    try:
-        main(all_prices)
-    except:  # FIXLASTME
-        import traceback; traceback.print_exc()
-        import pdb; pdb.post_mortem(sys.exc_info()[2])
+    main(all_prices)
