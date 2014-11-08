@@ -21,8 +21,7 @@ def downloadData(regionsNames, args):
     pool = Pool(cpu_count())
     print '\nTotal number of regions: ' + str(len(regionsNames))
     for num, name in enumerate(regionsNames):
-        f = pool.apply_async(getSpotPricesFromRegion, [args.awsKeyId, args.awsSecret, name, num],
-                             callback=cbLogPrices)
+        f = pool.apply_async(getSpotPricesFromRegion, [args, num, name], callback=cbLogPrices)
         # This ensures that the error is propagated to stdout should the function throw.
         # Note that this fails if the failure happens if num == 0, 1, 2, 3, ... (except the last)
         # For our purposes here, using multiple threads works though.
@@ -37,17 +36,19 @@ def cbLogPrices(pr):
     all_prices.append(pr)
 
 
-def getSpotPricesFromRegion(awsKeyId, awsSecret, regionName, regionNum):
+def getSpotPricesFromRegion(args, regionNum, regionName):
     '''Gets spot prices of the specified region.'''
     now = datetime.now()
     start = now - timedelta(days=180)  # Use a 6 month range
 
     print 'Processing region number ' + str(regionNum) + ': ',
     pr = boto.ec2.connect_to_region(regionName,
-                                    aws_access_key_id=awsKeyId,
-                                    aws_secret_access_key=awsSecret
+                                    aws_access_key_id=args.awsKeyId,
+                                    aws_secret_access_key=args.awsSecret
                                     ).get_spot_price_history(start_time=start.isoformat(),
-                                                             end_time=now.isoformat())
+                                                             end_time=now.isoformat(),
+                                                             instance_type=args.instanceType,
+                                                             product_description=args.os)
     print 'Finished getting the prices from: ' + regionName
     return pr
 
