@@ -19,7 +19,7 @@ def downloadData(regionsNames, args):
     '''Downloads data from EC2 itself.'''
     from multiprocessing import Pool, cpu_count
     pool = Pool(cpu_count())
-    print 'Total number of regions: ' + str(len(regionsNames))
+    print '\nTotal number of regions: ' + str(len(regionsNames))
     for num, name in enumerate(regionsNames):
         f = pool.apply_async(getSpotPricesFromRegion, [args.awsKeyId, args.awsSecret, name, num],
                              callback=cbLogPrices)
