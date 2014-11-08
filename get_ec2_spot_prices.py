@@ -54,12 +54,9 @@ def getSpotPricesFromRegion(args, regionNum, regionName):
 
 
 def isInternetOn():
-    '''
-    Tests if internet connection is working properly.
-    Adapted from http://stackoverflow.com/a/3764660.
-    '''
+    '''Tests if internet connection is working, adapted from http://stackoverflow.com/a/3764660'''
     try:
-        response = urllib2.urlopen('http://www.google.com/', timeout=1)
+        response = urllib2.urlopen('http://www.amazon.com/', timeout=1)
         return True
     except urllib2.URLError:
         pass
