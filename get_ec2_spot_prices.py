@@ -68,34 +68,27 @@ def isInternetOn():
 
 def parseArgs():
     '''Parse arguments as specified.'''
+    osChoices = ['linux', 'suselinux', 'windows']
+
     desc = 'Retrieves the latest EC2 prices and displays the lowest 3 and highest priced zones.'
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('-a', '--awsKeyId', dest='awsKeyId',
-                        help='Sets the AWS key ID.')
-    parser.add_argument('-b', '--awsSecret', dest='awsSecret',
-                        help='Sets the AWS secret access key.')
-    parser.add_argument('-t', '--instanceType', dest='instanceType', default='r3.large',
+    parser.add_argument('-a', '--awsKeyId', required=True, help='Sets the AWS key ID.')
+    parser.add_argument('-b', '--awsSecret', required=True, help='Sets the AWS secret access key.')
+    parser.add_argument('-t', '--instanceType', default='r3.large',
                         help='Sets the EC2 instance type. Defaults to %(default)s.')
-    parser.add_argument('-o', '--opSystem', dest='os', default='linux',
-                        help='Sets the operating system. Choose from [linux|windows|all]. ' +
-                             'Defaults to %(default)s.')
+    parser.add_argument('-o', '--os', default='linux', choices=osChoices,
+                        help='Sets the operating system. Choose from [' + '|'.join(osChoices) +
+                                ']. Defaults to %(default)s.')
+    parser.add_argument('-s', '--spawnNum', default=100, type=int,
+                        help='Sets the hypothetical number of instances to be spawned.')
     args = parser.parse_args()
 
-    if not args.awsKeyId:
-        raise Exception('You must specify an AWS key ID.')
-    if not args.awsSecret:
-        raise Exception('You must specify an AWS secret access key.')
-
-    args.instanceType = tuple(args.instanceType.split(','))  # Casted to a tuple for valid queries
-
     if args.os == 'linux':
-        args.os = ('Linux/UNIX',)  # Trailing comma forces it to become a tuple, which is needed.
+        args.os = 'Linux/UNIX'
+    elif args.os == 'suselinux':
+        args.os = 'SUSE Linux'
     elif args.os == 'windows':
-        args.os = ('Windows',)  # Trailing comma forces it to become a tuple, which is needed.
-    elif args.os == 'all':
-        args.os = ('Linux/UNIX', 'Windows')
-    else:
-        raise Exception('Invalid OS, choose from [linux|windows|all]: ' + args.os)
+        args.os = 'Windows'
 
     return args
 
