@@ -67,7 +67,7 @@ def parseArgs():
     '''Parse arguments as specified.'''
     osChoices = ['linux', 'suselinux', 'windows']
 
-    desc = 'Retrieves the latest EC2 prices and displays zones with the lowest latest price.'
+    desc = 'Uses boto to get spot instance prices and displays zones with the lowest latest price.'
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-a', '--awsKeyId', required=True, help='Sets the AWS key ID. (Required)')
     parser.add_argument('-b', '--awsSecret', required=True,
