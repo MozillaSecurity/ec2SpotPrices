@@ -117,7 +117,6 @@ def printCols(cur):
     '''Prints specified database columns.'''
     for row in cur.fetchall():
         print row
-        #print "%s %s %d" % (row["Id"], row["Name"], row["Price"])  # FIXLASTME
 
 
 def printResults(cur, args):
