@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import argparse
+import collections
 import sqlite3
 import urllib2
 
