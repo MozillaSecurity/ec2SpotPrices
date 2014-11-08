@@ -4,7 +4,7 @@ ec2SpotPrices
 Uses boto to get spot instance prices and displays zones with the lowest
 latest price.
 
-# Commandline Arguments
+### Commandline Arguments
 ```
   -h, --help            show this help message and exit
   -a AWSKEYID, --awsKeyId AWSKEYID
