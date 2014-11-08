@@ -40,7 +40,7 @@ def cbLogPrices(pr):
 def getSpotPricesFromRegion(awsKeyId, awsSecret, regionName, regionNum):
     '''Gets spot prices of the specified region.'''
     now = datetime.now()
-    start = now - timedelta(0, 180)  # Use a 3 minute range
+    start = now - timedelta(days=180)  # Use a 6 month range
 
     print 'Processing region number ' + str(regionNum) + ': ',
     pr = boto.ec2.connect_to_region(regionName,
