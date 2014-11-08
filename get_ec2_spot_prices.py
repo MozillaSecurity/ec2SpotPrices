@@ -4,6 +4,7 @@ import argparse
 import collections
 import sqlite3
 import urllib2
+from datetime import datetime, timedelta
 
 try:
     import boto
@@ -38,7 +39,6 @@ def cbLogPrices(pr):
 
 def getSpotPricesFromRegion(awsKeyId, awsSecret, regionName, regionNum):
     '''Gets spot prices of the specified region.'''
-    from datetime import datetime, timedelta
     now = datetime.now()
     start = now - timedelta(0, 180)  # Use a 3 minute range
 
