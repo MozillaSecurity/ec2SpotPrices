@@ -120,13 +120,82 @@ def printCols(cur):
 
 
 def printResults(cur, args):
-    # get the lowest 3 unique prices
-    # , extract their zones (removing dupes), check these zones' current price,
-    # extract only those that are within 10% of the lowest.
-    # Then take this as "how many percent" cheaper than the highest price in that period
-    # Use question mark notation
-    cur.execute('SELECT * FROM EC2Instances WHERE InstanceType=? ORDER BY Price', ('r3.large',))
-    printCols(cur)
+    '''Print region(s) and zone(s) of lowest latest price that is within 25% of the lowest ever.'''
+    # Fetch regions/zones at where the lowest prices occurred.
+    regionsZones = collections.OrderedDict()
+    cur.execute('SELECT Id, Region, Zone, Price FROM EC2Instances \
+                    WHERE InstanceType=? AND OperatingSystem=? ORDER BY Price ASC',
+                    (args.instanceType, args.os))
+    for row in cur.fetchall():
+        key = 'dbId-{0}_price-{1}'.format(row['Id'], row['Price'])
+        regionsZones[key] = row['Region'] + '_' + row['Zone']
+
+    lowestLatestPrice = -1
+    lowestRegionsZones = {}
+    zonesConsidered = []
+    print '\nList of prices:\n'
+    # Check the latest prices of these zones, because the lowest may not be the latest.
+    for idPrice, values in regionsZones.iteritems():
+        dbId, lowestPrice = idPrice[5:].split('_price-')
+        region, zone = regionsZones[idPrice].split('_')
+
+        if zone not in zonesConsidered:
+            cur.execute('SELECT Price FROM EC2Instances \
+                            WHERE InstanceType=? AND OperatingSystem=? AND Region=? AND Zone=? \
+                            ORDER BY DateTime DESC LIMIT 1',
+                            (args.instanceType, args.os, region, zone))
+            latestPrice = cur.fetchone()[0]
+            percentDiff = (latestPrice - float(lowestPrice)) * 10000 / (float(lowestPrice) * 100)
+            assert percentDiff >= 0, 'The latest price "{0}" cannot be '.format(latestPrice) + \
+                                        'lower than the lowest price "{0}".'.format(lowestPrice)
+            zonesConsidered.append(zone)
+
+            print 'Region with a lowest price of: US$ {0:.4f} and '.format(float(lowestPrice)) + \
+                    'a latest price of: US$ {0:.4f} - (difference of {1:.3g}%):\t{2}\tZone: {3}'\
+                    .format(float(latestPrice), percentDiff, region, zone)
+
+            # If latest price differs from lowest by ~25% or more, ignore due to price volatility
+            if percentDiff < 25:
+                if lowestLatestPrice == -1 or latestPrice < lowestLatestPrice:
+                    lowestLatestPrice = latestPrice
+                    lowestRegionsZones[regionsZones[idPrice]] = latestPrice
+
+                # It is okay to have multiple regions having the lowest latest price.
+                if lowestLatestPrice == latestPrice and \
+                        regionsZones[idPrice] not in lowestRegionsZones.keys():
+                    lowestRegionsZones[regionsZones[idPrice]] = latestPrice
+
+    if lowestLatestPrice == -1:
+        raise Exception('No price history obtained.')
+
+    # Remove regions/zones that do not have the lowest latest price.
+    lowestRegionsZones = {k: v for k, v in lowestRegionsZones.iteritems() if v == lowestLatestPrice}
+
+    print '\n======================================================================================'
+    print '\nSummary of lowest latest price{0}, available at the following zone{0}:\n'\
+            .format('s' if len(lowestRegionsZones.keys()) > 1 else '')
+
+    for regionZone, lowestPrice in lowestRegionsZones.iteritems():
+        region, zone = regionZone.split('_')
+        print '\tRegion:\t\t' + region
+        print '\tZone:\t\t' + zone
+        print '\t\t======'
+
+    print '\n\tInstance:\t{0}'.format(args.instanceType)
+    print '\tOS:\t\t{0}\n'.format(args.os)
+    print '\tUnit price:\tUS$ {0}\n'.format(lowestLatestPrice)
+
+    # Calculate daily, weekly, monthly and yearly costs of running the specified spot instance type.
+    freqDict = collections.OrderedDict({'hourly': 1})
+    freqDict['daily'] = freqDict['hourly'] * 24
+    freqDict['weekly'] = freqDict['daily'] * 7
+    freqDict['monthly'] = freqDict['daily'] * 365 / 12
+    freqDict['yearly'] = freqDict['daily'] * 365
+    print '\tQuantity:\t{0:,}'.format(args.spawnNum)
+    for freq, mul in freqDict.iteritems():
+        print '\t{0} price:\tUS$ {1:,.2f}'\
+            .format(freq.capitalize(), mul * lowestLatestPrice * args.spawnNum)
+    print
 
 
 def main(all_prices):
