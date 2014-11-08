@@ -110,9 +110,7 @@ def analysePrices(args, aP):
         sqdb.row_factory = sqlite3.Row
         cur = sqdb.cursor()
 
-        # These results only make sense when only one type of instance is specified.
-        if len(args.instanceType) == 1:
-            printResults(cur, args)
+        printResults(cur, args)
 
 
 def printCols(cur):
