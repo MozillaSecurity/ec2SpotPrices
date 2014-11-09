@@ -4,7 +4,9 @@ ec2SpotPrices
 Uses boto to get spot instance prices and displays zones with the lowest
 latest price.
 
-Daily, weekly, monthly and yearly cost estimates are given
+Daily, weekly, monthly and yearly cost estimates are given, assuming
+a number of instances to be spawned. Note that this does not take into
+account future price changes or fluctuations.
 
 It requires a valid AWS key ID and secret access key, and it is suggested
 that users create a separate key set specially for this purpose.
