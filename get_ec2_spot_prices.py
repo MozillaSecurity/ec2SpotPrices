@@ -72,7 +72,7 @@ def parseArgs():
     parser.add_argument('-a', '--awsKeyId', required=True, help='Sets the AWS key ID. (Required)')
     parser.add_argument('-b', '--awsSecret', required=True,
                         help='Sets the AWS secret access key. (Required)')
-    parser.add_argument('-s', '--spawnNum', default=100, type=int,
+    parser.add_argument('-n', '--spawnNum', default=100, type=int,
                         help='Sets the hypothetical number of instances to be spawned.')
     parser.add_argument('-o', '--os', default='linux', choices=osChoices,
                         help='Sets the operating system. Choose from [' + '|'.join(osChoices) +
