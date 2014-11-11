@@ -11,6 +11,21 @@ account future price changes or fluctuations.
 It requires a valid AWS key ID and secret access key, and it is suggested
 that users create a separate key set specially for this purpose.
 
+A sqlite3 database is generated in-memory to compute the result.
+
+## Strategy
+
+Strategy involves finding lowest ever price across 6 months, then
+selecting regions/zones with the lowest latest price.
+(and is within 25% of lowest ever price)
+
+The lowest latest price will never be lower than the lowest ever price
+across the past 6 months.
+
+## Assumptions
+- That 6 months of past data is sufficient
+- That 25% is a sufficient barrier to prevent sudden price spikes
+
 ### Commandline Arguments
 ```
   -h, --help            show this help message and exit
