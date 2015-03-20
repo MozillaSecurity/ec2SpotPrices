@@ -42,8 +42,7 @@ def getSpotPricesFromRegion(args, regionNum, regionName):
     start = now - timedelta(days=180)  # Use a 6 month range
 
     pr = boto.ec2.connect_to_region(regionName,
-                                    aws_access_key_id=args.awsKeyId,
-                                    aws_secret_access_key=args.awsSecret
+                                    profile_name = args.profile
                                     ).get_spot_price_history(start_time=start.isoformat(),
                                                              end_time=now.isoformat(),
                                                              instance_type=args.instanceType,
@@ -68,15 +67,13 @@ def parseArgs():
 
     desc = 'Uses boto to get spot instance prices and displays zones with the lowest latest price.'
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('-a', '--awsKeyId', required=True, help='Sets the AWS key ID. (Required)')
-    parser.add_argument('-b', '--awsSecret', required=True,
-                        help='Sets the AWS secret access key. (Required)')
     parser.add_argument('-n', '--spawnNum', default=100, type=int,
                         help='Sets the hypothetical number of instances to be spawned. ' +
                                 'Defaults to "%(default)s".')
     parser.add_argument('-o', '--os', default='linux', choices=osChoices,
                         help='Sets the operating system. Choose from [' + '|'.join(osChoices) +
                                 ']. Defaults to "%(default)s".')
+    parser.add_argument('-p', '--profile', default='laniakea', help='AWS profile name in .boto')
     parser.add_argument('-t', '--instanceType', default='r3.large',
                         help='Sets the EC2 instance type. Defaults to "%(default)s".')
     args = parser.parse_args()
