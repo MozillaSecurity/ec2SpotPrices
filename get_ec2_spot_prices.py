@@ -41,7 +41,6 @@ def getSpotPricesFromRegion(args, regionNum, regionName):
     now = datetime.now()
     start = now - timedelta(days=180)  # Use a 6 month range
 
-    print 'Processing region number ' + str(regionNum) + ': ',
     pr = boto.ec2.connect_to_region(regionName,
                                     aws_access_key_id=args.awsKeyId,
                                     aws_secret_access_key=args.awsSecret
