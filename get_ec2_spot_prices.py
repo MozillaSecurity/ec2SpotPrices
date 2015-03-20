@@ -73,7 +73,8 @@ def parseArgs():
     parser.add_argument('-o', '--os', default='linux', choices=osChoices,
                         help='Sets the operating system. Choose from [' + '|'.join(osChoices) +
                                 ']. Defaults to "%(default)s".')
-    parser.add_argument('-p', '--profile', default='laniakea', help='AWS profile name in .boto')
+    parser.add_argument('-p', '--profile', default='laniakea',
+                        help='AWS profile name in ".boto". Defaults to "%(default)s".')
     parser.add_argument('-t', '--instanceType', default='r3.large',
                         help='Sets the EC2 instance type. Defaults to "%(default)s".')
     args = parser.parse_args()
