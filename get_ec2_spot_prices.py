@@ -14,6 +14,8 @@ except ImportError:
 
 all_prices = []
 
+VERSION = 0.1
+
 
 def downloadData(regionsNames, args):
     '''Downloads data from EC2 itself.'''
@@ -77,6 +79,8 @@ def parseArgs():
     parser.add_argument('-spawn-num', dest='spawnNum', default=1, type=int,
                         help='Sets the hypothetical number of instances to be spawned. ' +
                                 'Defaults to "%(default)s".')
+    parser.add_argument('-version', action='version', version='%(prog)s {}'.format(VERSION),
+                        help=argparse.SUPPRESS)
 
     args = parser.parse_args()
 
