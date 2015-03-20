@@ -67,16 +67,17 @@ def parseArgs():
 
     desc = 'Uses boto to get spot instance prices and displays zones with the lowest latest price.'
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('-n', '--spawnNum', default=1, type=int,
-                        help='Sets the hypothetical number of instances to be spawned. ' +
-                                'Defaults to "%(default)s".')
-    parser.add_argument('-o', '--os', default='linux', choices=osChoices,
+    parser.add_argument('-instance-type', dest='instanceType', default='r3.large',
+                        help='Sets the EC2 instance type. Defaults to "%(default)s".')
+    parser.add_argument('-os', default='linux', choices=osChoices,
                         help='Sets the operating system. Choose from [' + '|'.join(osChoices) +
                                 ']. Defaults to "%(default)s".')
-    parser.add_argument('-p', '--profile', default='laniakea',
+    parser.add_argument('-profile', default='laniakea',
                         help='AWS profile name in ".boto". Defaults to "%(default)s".')
-    parser.add_argument('-t', '--instanceType', default='r3.large',
-                        help='Sets the EC2 instance type. Defaults to "%(default)s".')
+    parser.add_argument('-spawn-num', dest='spawnNum', default=1, type=int,
+                        help='Sets the hypothetical number of instances to be spawned. ' +
+                                'Defaults to "%(default)s".')
+
     args = parser.parse_args()
 
     if args.os == 'linux':

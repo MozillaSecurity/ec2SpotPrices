@@ -29,16 +29,12 @@ across the past 6 months.
 ### Commandline Arguments
 ```
   -h, --help            show this help message and exit
-  -a AWSKEYID, --awsKeyId AWSKEYID
-                        Sets the AWS key ID. (Required)
-  -b AWSSECRET, --awsSecret AWSSECRET
-                        Sets the AWS secret access key. (Required)
-  -n SPAWNNUM, --spawnNum SPAWNNUM
-                        Sets the hypothetical number of instances to be
-                        spawned. Defaults to "100".
-  -o {linux,suselinux,windows}, --os {linux,suselinux,windows}
+  -instance-type INSTANCETYPE
+                        Sets the EC2 instance type. Defaults to "r3.large".
+  -os {linux,suselinux,windows}
                         Sets the operating system. Choose from
                         [linux|suselinux|windows]. Defaults to "linux".
-  -t INSTANCETYPE, --instanceType INSTANCETYPE
-                        Sets the EC2 instance type. Defaults to "r3.large".
+  -profile PROFILE      AWS profile name in ".boto". Defaults to "laniakea".
+  -spawn-num SPAWNNUM   Sets the hypothetical number of instances to be
+                        spawned. Defaults to "1".
 ```
