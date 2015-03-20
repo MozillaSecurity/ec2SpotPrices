@@ -67,7 +67,7 @@ def parseArgs():
 
     desc = 'Uses boto to get spot instance prices and displays zones with the lowest latest price.'
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('-n', '--spawnNum', default=100, type=int,
+    parser.add_argument('-n', '--spawnNum', default=1, type=int,
                         help='Sets the hypothetical number of instances to be spawned. ' +
                                 'Defaults to "%(default)s".')
     parser.add_argument('-o', '--os', default='linux', choices=osChoices,
