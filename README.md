@@ -25,6 +25,7 @@ across the past 6 months.
 ## Assumptions
 - That 6 months of past data is sufficient
 - That 25% is a sufficient barrier to prevent sudden price spikes
+- Cost of EBS storage is not considered
 
 ### Commandline Arguments
 ```
